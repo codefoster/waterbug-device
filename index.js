@@ -1,4 +1,4 @@
-var waterrower = require("./Waterrower");
+var waterrower = require("node-waterrower/Waterrower");
 
 var readWaterrower = function () {
 	console.log();
