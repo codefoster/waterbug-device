@@ -1,0 +1,24 @@
+{
+  "name": "waterbug-device",
+  "version": "1.0.0",
+  "description": "",
+  "main": "index.js",
+  "dependencies": {
+    "node-waterrower": "github:codefoster/node-waterrower"
+  },
+  "devDependencies": {},
+  "scripts": {
+    "test": "echo \"Error: no test specified\" && exit 1"
+  },
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/codefoster/waterbug-device.git"
+  },
+  "keywords": [],
+  "author": "Jeremy Foster <jeremy.foster@live.com> (http://codefoster.com)",
+  "license": "Apache-2.0",
+  "bugs": {
+    "url": "https://github.com/codefoster/waterbug-device/issues"
+  },
+  "homepage": "https://github.com/codefoster/waterbug-device#readme"
+}
