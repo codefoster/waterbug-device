@@ -4,7 +4,8 @@
   "description": "",
   "main": "index.js",
   "dependencies": {
-    "node-waterrower": "github:codefoster/node-waterrower"
+    "node-waterrower": "github:codefoster/node-waterrower",
+    "prompt": "^0.2.14"
   },
   "devDependencies": {},
   "scripts": {
