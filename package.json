@@ -4,6 +4,8 @@
   "description": "",
   "main": "index.js",
   "dependencies": {
+    "mongodb": "^2.0.49",
+    "monk": "^1.0.1",
     "node-waterrower": "github:codefoster/node-waterrower",
     "prompt": "^0.2.14"
   },
