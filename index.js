@@ -1,6 +1,7 @@
 var prompt = require('prompt');
 var mongodb = require('mongodb');
 var mongoose = require('mongoose');
+var socket = require('socket.io-client')('http://waterbugsite.azurewebsites.net');
 var config = require('./config');
 
 // var db = monk(config.mongoConnectionString);
@@ -15,7 +16,6 @@ var DataPoint = mongoose.model('DataPoint', {
 		calories: Number
 	}
 )
-
 
 // var waterrower = require("node-waterrower/Waterrower");
 
@@ -46,12 +46,19 @@ prompt.get(promptProps, function (err, result) {
 
 
 function sendData(){
-	//send data
-	dp = new DataPoint(randomDataPoint());
+	var newDataPoint = randomDataPoint();
+	
+	//send data to mongo
+	//TODO: we decided this should go in the -site project which will
+	//eliminate a dependency on mongo on the -device
+	dp = new DataPoint(newDataPoint);
 	dp.save(function(err){
 		if(err) throw err;
 	})
-		
+
+	//send data to waterbug website (via sockets)
+	socket.emit('event',newDataPoint);
+	
 	setTimeout(sendData, 1000);
 }
 
