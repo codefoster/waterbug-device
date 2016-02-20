@@ -1,7 +1,8 @@
 {
   "name": "waterbug-device",
   "version": "0.1.0",
-  "description": "",
+  "author": "Jeremy Foster <jeremy.foster@live.com> (http://codefoster.com)",
+  "description": "Device part of the Waterrower project",
   "main": "index.js",
   "dependencies": {
     "mongodb": "^2.0.49",
@@ -18,7 +19,6 @@
     "url": "git+https://github.com/codefoster/waterbug-device.git"
   },
   "keywords": [],
-  "author": "Jeremy Foster <jeremy.foster@live.com> (http://codefoster.com)",
   "license": "Apache-2.0",
   "bugs": {
     "url": "https://github.com/codefoster/waterbug-device/issues"
