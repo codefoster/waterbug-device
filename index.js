@@ -1,21 +1,6 @@
 var prompt = require('prompt');
-var mongodb = require('mongodb');
-var mongoose = require('mongoose');
-var socket = require('socket.io-client')('http://waterbugsite.azurewebsites.net');
+var socket = require('socket.io-client')('http://localhost:8080');
 var config = require('./config');
-
-// var db = monk(config.mongoConnectionString);
-mongoose.connect('mongodb://waterbugwin.cloudapp.net:27017/waterbug');
-var DataPoint = mongoose.model('DataPoint', {
-		name: String,
-		strokeRate: Number,
-		totalSpeed: Number,
-		averageSpeed: Number,
-		distance: Number,
-		heartRate: Number,
-		calories: Number
-	}
-)
 
 // var waterrower = require("node-waterrower/Waterrower");
 
@@ -34,42 +19,25 @@ var name;
 
 prompt.start();
 var promptProps = [{
-	name: 'name',
-	type: 'string',
-	description: 'What\'s your name?'
+    name: 'name',
+    type: 'string',
+    description: 'What\'s your name?'
 }]
-prompt.get(promptProps, function (err, result) {
-	if(err) throw err;
-	name = result.name;
-	sendData();
+prompt.get(promptProps, function(err, result) {
+    if (err) throw err;
+    config.name = result.name;
+    sendData();
 })
 
 
-function sendData(){
-	var newDataPoint = randomDataPoint();
-	
-	//send data to mongo
-	//TODO: we decided this should go in the -site project which will
-	//eliminate a dependency on mongo on the -device
-	dp = new DataPoint(newDataPoint);
-	dp.save(function(err){
-		if(err) throw err;
-	})
+function sendData() {
+    var stroke = {
+        name: config.name,
+        caloriesPerMinute: 0,
+        distance: 0,
+        strokeRates: []
+    };
 
-	//send data to waterbug website (via sockets)
-	socket.emit('event',newDataPoint);
-	
-	setTimeout(sendData, 1000);
-}
-
-function randomDataPoint(){
-	return {
-		name: name,
-		strokeRate: Math.floor((Math.random() * 20)) + 40,
-		totalSpeed: Math.floor((Math.random() * 40)) + 78,
-		averageSpeed: Math.floor((Math.random() * 5)) + 54,
-		distance: Math.floor((Math.random() * 5)) + 12,
-		heartRate: Math.floor((Math.random() * 10)) + 95,
-		calories: Math.floor((Math.random() * 45)) + 90
-	}
+    socket.emit('stroke', stroke);
+    setTimeout(sendData, 1000);
 }

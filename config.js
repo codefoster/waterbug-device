@@ -1,3 +1,3 @@
 module.exports = {
-	mongoConnectionString:'waterbugwin.cloudapp.net:27017/waterbug'
+    name:"Rower 1"
 }
