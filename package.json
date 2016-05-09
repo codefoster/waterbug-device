@@ -5,6 +5,7 @@
   "description": "Device part of the Waterrower project",
   "main": "index.js",
   "dependencies": {
+    "minimist": "^1.2.0",
     "mongodb": "^2.0.49",
     "node-waterrower": "github:codefoster/node-waterrower",
     "prompt": "^0.2.14",

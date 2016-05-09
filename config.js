@@ -1,3 +1,3 @@
 module.exports = {
-    name:"Rower 1"
+    name:"Rower"
 }
