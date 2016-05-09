@@ -14,30 +14,17 @@ var config = require('./config');
 // 	console.log("Calories..." + waterrower.readCalories());    // [ kcal ]
 // }
 
-var dp;
-var name;
-
-prompt.start();
-var promptProps = [{
-    name: 'name',
-    type: 'string',
-    description: 'What\'s your name?'
-}]
-prompt.get(promptProps, function(err, result) {
-    if (err) throw err;
-    config.name = result.name;
-    sendData();
-})
-
+sendData();
 
 function sendData() {
     var stroke = {
+        message: "stroke",
         name: config.name,
-        caloriesPerMinute: 0,
-        distance: 0,
-        strokeRates: []
+        caloriesPerMinute: Math.round((Math.random() * 10) + 70),
+        distance: Math.round((Math.random() * 5) + 20),
+        strokeRate: Math.round((Math.random() * 5) + 20),
     };
 
-    socket.emit('stroke', stroke);
+    socket.send(stroke);
     setTimeout(sendData, 1000);
 }
