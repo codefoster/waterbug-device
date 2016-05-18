@@ -1,6 +1,6 @@
 var prompt = require('prompt');
-var socket = require('socket.io-client')('http://localhost:8080');
 var config = require('./config');
+var socket = require('socket.io-client')(config.socketServer || 'http://localhost:8080');
 var args = require('minimist')(process.argv.slice(2));
 
 
@@ -32,5 +32,6 @@ function sendData() {
     };
 
     socket.send(stroke);
+    
     setTimeout(sendData, 1000);
 }
