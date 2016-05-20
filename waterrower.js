@@ -95,8 +95,10 @@ var actions = [
         name: 'clock (seconds)',
         pattern: /IDS1E1([\dA-F]+)/,
         action: function (matches) {
-            state.clock = matches[1];
-            events.emit('data');
+            if (state.clock != matches[1]) {
+                state.clock = matches[1];
+                events.emit('data');
+            }
         }
     },
     {
