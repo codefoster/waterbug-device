@@ -1,23 +1,10 @@
-//TODO: use Rx for handling serial port communication
-
+var EventEmitter = require('events');
 var serialport = require('serialport');
 
 var PORT_NAME = '/dev/ttyACM0';
 var BAUD_RATE = '19200'; //TODO: experiment with faster (i.e. 115200)
 var REFRESH_RATE = 200;
-
-/*
-TODO: use this to detect a water rower instead of hard coding
-a waterrower returns the following port object from a .list function
-{
-    "comName":"/dev/ttyACM0",
-    "manufacturer":"Microchip_Technology_Inc.",
-    "serialNumber":"Microchip_Technology_Inc._CDC_RS-232:_WR-S4.2",
-    "pnpId":"usb-Microchip_Technology_Inc._CDC_RS-232:_WR-S4.2-if00",
-    "vendorId":"0x04d8",
-    "productId":"0x000a"
-}
-*/
+var events = new EventEmitter();
 
 var state = {
     distance_l: 0,
@@ -37,12 +24,13 @@ port.on('open', function () {
     send('DDME'); //change the display to meters
     send('RESET'); //reset the waterrower 
 
-    // port.write('WSI1' + DecimalToACH(500)); //set the workout to 500 meters
+    // port.write('WSI1' + decToHex(500)); //set the workout to 500 meters
     // port.write('IV?\r\n'); //ask the waterrower for its model
 
     setInterval(function () {
-        send('IRS055');
         send('IRS056');
+        send('IRS055');
+        //TODO: request stroke rate too
     }, REFRESH_RATE);
 });
 
@@ -54,23 +42,26 @@ var actions = [
         action: function (matches) { state.distance_h = matches[1]; }
     },
     {
-        name: 'distance (high byte)',
+        name: 'distance (low byte)',
         pattern: /IDS055([\dA-F]+)/,
-        action: function (matches) { state.distance_l = matches[1]; }
+        action: function (matches) {
+            if (state.distance_l != matches[1]) {
+                state.distance_l = matches[1];
+                events.emit('data', hexToDec(state.distance_h + '' + state.distance_l));
+            }
+        }
     },
     {
+        name: 'pulse',
         pattern: /P(\d+)/,
         action: null
     }
 ];
 
-//build regular expressions for each action
-actions.forEach(function (a) { a.re = new RegExp(a.pattern); });
-
 //when a message is received, apply the appropriate action
 port.on('data', function (data) {
     actions.forEach(function (a) {
-        var matches = a.re.exec(data);
+        var matches = a.pattern.exec(data);
         if (matches && a.action) a.action(matches);
     });
 });
@@ -83,7 +74,7 @@ function send(value) {
     port.write(value + '\r\n');
 }
 
-function AchToDecimal(input) {
+function hexToDec(input) {
     var value;
     var total = 0;
     for (var i = 0; i < input.length; i++) {
@@ -97,7 +88,7 @@ function AchToDecimal(input) {
     return (total);
 }
 
-function DecimalToACH(input) {
+function decToHex(input) {
     var value;
     var total = 0;
     for (var i = input.length - 1; i >= 0; i--) {
@@ -111,8 +102,11 @@ function DecimalToACH(input) {
     return (total);
 }
 
-module.exports = {
-    distance: function() {
-        return AchToDecimal(state.distance_h + state.distance_l);
+events.getData = function() {
+    return {
+        distance: hexToDec(state.distance_h + '' + state.distance_l),
+        strokeRate: 0 
     }
 }
+
+module.exports = events;

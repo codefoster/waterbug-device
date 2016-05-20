@@ -4,17 +4,18 @@ var args = require('minimist')(process.argv.slice(2));
 var waterrower = require('./waterrower');
 
 if(args.n) config.name = args.n;
-setInterval(sendData, 500);
+// setInterval(sendData, 500);
+waterrower.on('data', sendData);
 
 function sendData() {
     var stroke = {
-        message: "stroke",
+        message: "strokedata",
         name: config.name,
-        // caloriesPerMinute: Math.round((Math.random() * 10) + 70),
         // distance: Math.round((Math.random() * 5) + 20),
-        distance: waterrower.distance(),
+        distance: waterrower.getData().distance,
         strokeRate: Math.round((Math.random() * 5) + 20),
     };
 
+    console.log('sending stroke data');
     socket.send(stroke);    
 }
