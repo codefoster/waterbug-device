@@ -1,21 +1,23 @@
 var config = require('./config');
-var socket = require('socket.io-client')(config.socketServer || 'http://localhost:8080');
 var args = require('minimist')(process.argv.slice(2));
 var waterrower = require('./waterrower');
 
-if(args.n) config.name = args.n;
-// setInterval(sendData, 500);
-waterrower.on('data', sendData);
+//command line arguments
+var name = (args.n?args.n:(config.name?config.name:'Rower'));
+var socketServer = (args.s?args.s:(config.socketServer?config.socketServer:'http://localhost:8080'));
 
-function sendData() {
-    var stroke = {
+console.log('name: ' + name);
+console.log('socketServer: ' + socketServer);
+
+//wire up to the socket server
+var socket = require('socket.io-client')(socketServer);
+
+//respond to the waterrower sending data
+waterrower.on('data', function () {
+    socket.send({
         message: "strokedata",
         name: config.name,
-        // distance: Math.round((Math.random() * 5) + 20),
         distance: waterrower.getData().distance,
         strokeRate: Math.round((Math.random() * 5) + 20),
-    };
-
-    console.log('sending stroke data');
-    socket.send(stroke);    
-}
+    });    
+});
