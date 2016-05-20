@@ -11,7 +11,8 @@ var state = {
     distance_h: 0,
     strokeRate: 0,
     speed_l: 0,
-    speed_h: 0,    
+    speed_h: 0,
+    clock: 0,
 }
 
 var port = new serialport.SerialPort(PORT_NAME, {
@@ -31,11 +32,17 @@ port.on('open', function () {
     // port.write('IV?\r\n'); //ask the waterrower for its model
 
     setInterval(function () {
-        //request data
+        //request distance data
         send('IRS055');
         send('IRS056');
+        
+        //request speed data
         send('IRS14A');
         send('IRS14B');
+        
+        //request clock data
+        send('IRS1E1');
+        
     }, REFRESH_RATE);
 });
 
@@ -82,6 +89,14 @@ var actions = [
                 state.strokeRate = matches[1];
                 events.emit('data');
             }
+        }
+    },
+    {
+        name: 'clock (seconds)',
+        pattern: /IDS1E1([\dA-F]+)/,
+        action: function (matches) {
+            state.clock = matches[1];
+            events.emit('data');
         }
     },
     {
@@ -139,7 +154,8 @@ events.getData = function() {
     return {
         distance: hexToDec(state.distance_h + '' + state.distance_l),
         strokeRate: hexToDec(state.strokeRate),
-        speed: hexToDec(state.speed_h + '' + state.speed_l)
+        speed: hexToDec(state.speed_h + '' + state.speed_l),
+        clock: hexToDec(state.clock),
     }
 }
 

@@ -20,6 +20,7 @@ waterrower.on('data', function () {
         name: config.name,
         distance: d.distance,
         strokeRate: d.strokeRate,
-        speed: d.speed
+        speed: d.speed,
+        clock: d.clock
     });    
 });
