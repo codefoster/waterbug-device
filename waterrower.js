@@ -63,10 +63,8 @@ var actions = [
         name: 'speed (low byte)',
         pattern: /IDS14A([\dA-F]+)/,
         action: function (matches) {
-            if (state.speed_l != matches[1]) {
+            if (state.speed_l != matches[1]) 
                 state.speed_l = matches[1];
-                events.emit('data');
-            }
         }
     },
     {
