@@ -8,7 +8,10 @@ var events = new EventEmitter();
 
 var state = {
     distance_l: 0,
-    distance_h: 0
+    distance_h: 0,
+    strokeRate: 0,
+    speed_l: 0,
+    speed_h: 0,    
 }
 
 var port = new serialport.SerialPort(PORT_NAME, {
@@ -28,26 +31,61 @@ port.on('open', function () {
     // port.write('IV?\r\n'); //ask the waterrower for its model
 
     setInterval(function () {
-        send('IRS056');
+        //request data
         send('IRS055');
-        //TODO: request stroke rate too
+        send('IRS056');
+        send('IRS14A');
+        send('IRS14B');
     }, REFRESH_RATE);
 });
 
 //this is the declarative list of things to do when the waterrower sends us a message
 var actions = [
     {
-        name: 'distance (high byte)',
-        pattern: /IDS056([\dA-F]+)/,
-        action: function (matches) { state.distance_h = matches[1]; }
-    },
-    {
         name: 'distance (low byte)',
         pattern: /IDS055([\dA-F]+)/,
         action: function (matches) {
-            if (state.distance_l != matches[1]) {
+            if (state.distance_l != matches[1]) 
                 state.distance_l = matches[1];
-                events.emit('data', hexToDec(state.distance_h + '' + state.distance_l));
+        }
+    },
+    {
+        name: 'distance (high byte)',
+        pattern: /IDS056([\dA-F]+)/,
+        action: function (matches) {
+            if (state.distance_h != matches[1]) {
+                state.distance_h = matches[1];
+                events.emit('data');
+            }
+        }
+    },
+    {
+        name: 'speed (low byte)',
+        pattern: /IDS14A([\dA-F]+)/,
+        action: function (matches) {
+            if (state.speed_l != matches[1]) {
+                state.speed_l = matches[1];
+                events.emit('data');
+            }
+        }
+    },
+    {
+        name: 'speed (high byte)',
+        pattern: /IDS14B([\dA-F]+)/,
+        action: function (matches) {
+            if (state.speed_h != matches[1]) {
+                state.speed_h = matches[1];
+                events.emit('data');
+            }
+        }
+    },
+    {
+        name: 'stroke rate',
+        pattern: /IDS142([\dA-F]+)/,
+        action: function (matches) {
+            if (state.strokeRate != matches[1]) {
+                state.strokeRate = matches[1];
+                events.emit('data');
             }
         }
     },
@@ -105,7 +143,8 @@ function decToHex(input) {
 events.getData = function() {
     return {
         distance: hexToDec(state.distance_h + '' + state.distance_l),
-        strokeRate: 0 
+        strokeRate: hexToDec(state.strokeRate),
+        speed: hexToDec(state.speed_h + '' + state.speed_l)
     }
 }
 

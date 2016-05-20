@@ -14,10 +14,12 @@ var socket = require('socket.io-client')(socketServer);
 
 //respond to the waterrower sending data
 waterrower.on('data', function () {
+    var d = waterrower.getData();
     socket.send({
         message: "strokedata",
         name: config.name,
-        distance: waterrower.getData().distance,
-        strokeRate: Math.round((Math.random() * 5) + 20),
+        distance: d.distance,
+        strokeRate: d.strokeRate,
+        speed: d.speed
     });    
 });
