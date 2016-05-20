@@ -45,19 +45,16 @@ var actions = [
         name: 'distance (low byte)',
         pattern: /IDS055([\dA-F]+)/,
         action: function (matches) {
-            if (state.distance_l != matches[1]) 
+            if (state.distance_l != matches[1]) {
                 state.distance_l = matches[1];
+                events.emit('data');
+            }
         }
     },
     {
         name: 'distance (high byte)',
         pattern: /IDS056([\dA-F]+)/,
-        action: function (matches) {
-            if (state.distance_h != matches[1]) {
-                state.distance_h = matches[1];
-                events.emit('data');
-            }
-        }
+        action: function (matches) { state.distance_h = matches[1]; }
     },
     {
         name: 'speed (low byte)',
