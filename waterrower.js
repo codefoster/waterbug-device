@@ -161,4 +161,8 @@ events.getData = function() {
     }
 }
 
+events.reset = function() {
+    send('RESET'); //reset the waterrower 
+}
+
 module.exports = events;
