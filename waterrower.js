@@ -4,7 +4,7 @@ var serialport = require('serialport');
 var PORT_NAME = '/dev/ttyACM0';
 var BAUD_RATE = '19200'; //TODO: experiment with faster (i.e. 115200)
 var REFRESH_RATE = 200;
-var events = new EventEmitter();
+var wr = new EventEmitter();
 
 var state = {
     distance_l: 0,
@@ -28,7 +28,6 @@ port.on('open', function () {
     send('DDME'); //change the display to meters
     send('RESET'); //reset the waterrower 
 
-    // port.write('WSI1' + decToHex(500)); //set the workout to 500 meters
     // port.write('IV?\r\n'); //ask the waterrower for its model
 
     setInterval(function () {
@@ -54,7 +53,7 @@ var actions = [
         action: function (matches) {
             if (state.distance_l != matches[1]) {
                 state.distance_l = matches[1];
-                events.emit('data');
+                wr.emit('data');
             }
         }
     },
@@ -77,7 +76,7 @@ var actions = [
         action: function (matches) {
             if (state.speed_h != matches[1]) {
                 state.speed_h = matches[1];
-                events.emit('data');
+                wr.emit('data');
             }
         }
     },
@@ -87,7 +86,7 @@ var actions = [
         action: function (matches) {
             if (state.strokeRate != matches[1]) {
                 state.strokeRate = matches[1];
-                events.emit('data');
+                wr.emit('data');
             }
         }
     },
@@ -97,7 +96,7 @@ var actions = [
         action: function (matches) {
             if (state.clock != matches[1]) {
                 state.clock = matches[1];
-                events.emit('data');
+                wr.emit('data');
             }
         }
     },
@@ -117,7 +116,7 @@ port.on('data', function (data) {
 });
 
 port.on('closed', function () { console.log('connection closed'); });
-port.on('error', function (err) { console.log('connection error'); });
+port.on('error', function (err) { console.log('Please plug in your WaterRower and start again...'); });
 
 function send(value) {
     // console.log('Sending: ' + value);
@@ -152,7 +151,7 @@ function decToHex(input) {
     return (total);
 }
 
-events.getData = function() {
+wr.getData = function() {
     return {
         distance: hexToDec(state.distance_h + '' + state.distance_l),
         strokeRate: hexToDec(state.strokeRate),
@@ -161,8 +160,14 @@ events.getData = function() {
     }
 }
 
-events.reset = function() {
+wr.reset = function() {
     send('RESET'); //reset the waterrower 
 }
 
-module.exports = events;
+wr.startRace = function(options) {
+    console.log('options.distance: ' + options.distance);
+    //set up new race using options.distance
+    send('WSI1' + decToHex(options.distance));
+}
+
+module.exports = wr;

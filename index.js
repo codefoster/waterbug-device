@@ -12,8 +12,10 @@ console.log('socketServer: ' + socketServer);
 //wire up to the socket server
 var socket = require('socket.io-client')(socketServer);
 socket.on("message", function(data) {
-    if(data.message == 'startrace')
+    if(data.message == 'startrace'){
         waterrower.reset();
+        waterrower.startRace({ distance:data.distance });
+    }
 });
 
 //respond to the waterrower sending data
