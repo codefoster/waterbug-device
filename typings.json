@@ -1,0 +1,10 @@
+{
+  "name": "waterbug-device",
+  "dependencies": {
+    "minimist": "registry:npm/minimist#1.0.0+20160229232932"
+  },
+  "globalDependencies": {
+    "node": "registry:dt/node#6.0.0+20160524002506",
+    "socket.io-client": "registry:dt/socket.io-client#1.4.4+20160317120654"
+  }
+}
