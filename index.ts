@@ -1,12 +1,11 @@
 import { Observable, Subject} from 'rxjs/Rx';
-import { Config } from './config';
+import config from './config';
 import * as minimist from 'minimist';
 import * as io from 'socket.io-client';
 
 var args = minimist(process.argv.slice(2));
 import { WaterRower } from 'waterrower';
 
-let config = new Config();
 let waterrower = new WaterRower();
 
 //command line arguments
@@ -26,8 +25,8 @@ socket.on("message", data => {
 });
 
 //respond to the waterrower sending data
-waterrower.data.subscribe(() => {
-    var d = waterrower.getData();
+waterrower.data$.subscribe(() => {
+    var d = waterrower.data;
     socket.send({
         message: "strokedata",
         name: rowerName,
