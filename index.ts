@@ -1,10 +1,10 @@
-import { Observable, Subject} from 'rxjs/Rx';
+import { Subject } from 'rxjs/Rx';
 import config from './config';
 import * as minimist from 'minimist';
 import * as io from 'socket.io-client';
 
 var args = minimist(process.argv.slice(2));
-import { WaterRower } from 'waterrower';
+import WaterRower from 'waterrower';
 
 let waterrower = new WaterRower();
 
