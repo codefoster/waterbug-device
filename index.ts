@@ -4,7 +4,7 @@ import * as minimist from 'minimist';
 import * as io from 'socket.io-client';
 
 var args = minimist(process.argv.slice(2));
-import { WaterRower } from 'waterrower';
+import { WaterRower, Units } from 'waterrower';
 
 let waterrower = new WaterRower();
 
@@ -20,19 +20,21 @@ var socket = io(socketServerUrl);
 socket.on("message", data => {
     if (data.message == 'startrace') {
         waterrower.reset();
-        waterrower.startRace({ distance: data.distance });
+        waterrower.defineDistanceWorkout(data.distance, Units.Meters);
     }
 });
 
-//respond to the waterrower sending data
-waterrower.data$.subscribe(() => {
-    var d = waterrower.data;
-    socket.send({
-        message: "strokedata",
-        name: rowerName,
-        distance: d.distance,
-        strokeRate: d.strokeRate,
-        speed: d.speed,
-        clock: d.clock
+// respond to the waterrower sending data
+// only if the data sent is one of the values we care about
+waterrower.datapoints$
+    .filter(d => ['distance','strokeRate','speed','clock'].some(n => d.name === n))
+    .subscribe(() => {
+        socket.send({
+            message: "strokedata",
+            name: rowerName,
+            distance: waterrower.readDataPoint('distance'),
+            strokeRate: waterrower.readDataPoint('strokeRate'),
+            speed: waterrower.readDataPoint('speed'),
+            clock: waterrower.readDataPoint('clock')
+        });
     });
-});
