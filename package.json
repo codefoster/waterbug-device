@@ -2,12 +2,11 @@
   "name": "waterbug-device",
   "version": "0.1.0",
   "author": "Jeremy Foster <jeremy.foster@live.com> (http://codefoster.com)",
-  "description": "Device part of the Waterrower project",
+  "description": "Device part of the Waterbug project",
   "main": "index.js",
   "dependencies": {
     "minimist": "^1.2.0",
     "rxjs": "^5.0.0-beta.8",
-    "serialport": "3.1.1",
     "socket.io-client": "^1.3.7"
   },
   "scripts": {

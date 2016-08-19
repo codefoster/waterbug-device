@@ -1,10 +1,10 @@
-import { Subject } from 'rxjs/Rx';
+import { Observable, Subject } from 'rxjs/Rx';
 import config from './config';
 import * as minimist from 'minimist';
 import * as io from 'socket.io-client';
 
 var args = minimist(process.argv.slice(2));
-import WaterRower from 'waterrower';
+import { WaterRower, Units } from 'waterrower';
 
 let waterrower = new WaterRower();
 
@@ -20,19 +20,24 @@ var socket = io(socketServerUrl);
 socket.on("message", data => {
     if (data.message == 'startrace') {
         waterrower.reset();
-        waterrower.startRace({ distance: data.distance });
+        waterrower.defineDistanceWorkout(data.distance, Units.Meters);
     }
 });
 
-//respond to the waterrower sending data
-waterrower.data$.subscribe(() => {
-    var d = waterrower.data;
-    socket.send({
-        message: "strokedata",
-        name: rowerName,
-        distance: d.distance,
-        strokeRate: d.strokeRate,
-        speed: d.speed,
-        clock: d.clock
+console.log('waiting for datapoints...');
+// respond to the waterrower sending data
+// only if the data sent is one of the values we care about
+waterrower.datapoints$
+    .filter(d => ['distance','stroke_average','speed_average','clock_down'].some(n => d.name === n))
+    .subscribe(d => {
+        //we're not using d here because it has the value for a single datapoint, but we want to return all of these values together when any one of them changes
+        let message = {
+            message: "strokedata",
+            name: rowerName,
+            distance: waterrower.readDataPoint('distance'),
+            stroke_average: waterrower.readDataPoint('stroke_average'),
+            speed_average: waterrower.readDataPoint('speed_average'),
+            clock_down: waterrower.readDataPoint('clock_down')
+        };
+        socket.send(message);
     });
-});
