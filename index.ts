@@ -6,9 +6,7 @@ import * as io from 'socket.io-client';
 var args = minimist(process.argv.slice(2));
 import { WaterRower, Units } from 'waterrower';
 
-let waterrower = new WaterRower({
-    portName:"COM6"
-});
+let waterrower = new WaterRower();
 
 //command line arguments
 let rowerName = (args["n"] ? args["n"] : (config.name ? config.name : 'Rower'));
